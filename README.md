@@ -9,12 +9,12 @@ Single-header C library [OCP microscaling (MX) formats](https://www.opencompute.
 #include <stdio.h>
 
 int main() {
-    auto a = mx_encode(cmxe5m2, 21.37);
+    auto a = mx_encode(cmxe4m3, 21.37);
     printf("%g\n", mx_decode(a));
 }
 ```
 Prints
 ```
-21.5
+20
 ```
 

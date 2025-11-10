@@ -6,28 +6,43 @@
 
 #define LOG(...) fprintf(stderr, __VA_ARGS__)
 
-void test_e4m3() {
-    LOG("Testing E4M3\n");
-    float tc[][2] =  {
-        // test cases
-        { 0.0f,    0.0f },
-        { 1.0f,    1.0f },
-        {  NAN,     NAN },
-    };
+#define CHECK(cnd, ...) \
+    if (cnd); else (LOG(__VA_ARGS__), exit(-1))
 
-    for (size_t i = 0; i < sizeof tc / sizeof tc[0]; ++i) {
-        float x = tc[i][0];
-        float y = tc[i][1];
-        auto m = cmxe4m3_encode(x);
-        float z = cmxe4m3_decode(m);
+typedef struct {
+    float x;
+    float y;
+    uint8_t r;
+} tc_s;
 
-        if (z != y) {
-            LOG("\tError: %g -> %g (got %g)\n", x, y, z);
-            exit(-1);
-        }
-    }
-}
+#define TEST(type, testcases) do {                                                \
+    LOG("Testing " #type "\n");                                                   \
+    for (size_t i = 0; i < sizeof(testcases) / sizeof(tc_s); ++i) {               \
+        tc_s t = (testcases)[i];                                                  \
+        type m = type ## _encode(t.x);                                            \
+        CHECK(m.r == t.r, "\tError: encode: %g -> %x (got %x)\n", t.x, t.r, m.r); \
+        float z = type ## _decode(m);                                             \
+        CHECK(z == t.y,   "\tError: decode: %g -> %g (got %g)\n", t.x, t.y, z);   \
+    }                                                                             \
+} while (0)
+
+static tc_s e2m1_tests[] =  {
+    // test cases
+    {  0.0f,    0.0f, 0b0'0000'000 },
+    { -1.0f,   -1.0f, 0b1'0111'000 },
+    {  1.0f,    1.0f, 0b0'0111'000 },
+    {   NAN,     NAN, 0b1'1111'111 },
+};
+
+static tc_s e4m3_tests[] =  {
+    // test cases
+    {  0.0f,    0.0f, 0b0'0000'000 },
+    { -1.0f,   -1.0f, 0b1'0111'000 },
+    {  1.0f,    1.0f, 0b0'0111'000 },
+    {   NAN,     NAN, 0b1'1111'111 },
+};
 
 int main() {
-    test_e4m3();
+    TEST(cmxe2m1, e2m1_tests);
+    TEST(cmxe4m3, e4m3_tests);
 }

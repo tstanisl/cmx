@@ -9,12 +9,13 @@ typedef union { uint8_t r; struct { uint8_t m:1, e:2, s:1, _:4; }; } cmxe2m1;
 typedef union { uint8_t r; struct { uint8_t m:3, e:4, s:1;      }; } cmxe4m3;
 
 // helper for conversions from float
-typedef union { float f; struct { uint32_t m:23, e:8, s:1; }; } cmxcvt_;
+typedef union { float f; uint32_t r; struct { uint32_t m:23, e:8, s:1; }; } cmxcvt_;
 
 static inline cmxe2m1 cmxe2m1_encode(float f) {
+    if (f < -6.0f || 6.0f < f) return (cmxe2m1) { .s = (f < 0), .e = 3, .m = 1 };
+    if (-1.0f < f && f < 1.0) return (cmxe2m1) { .s = (f < 0), .m = (int) (fabsf(f) + 0.5f) };
     cmxcvt_ c = { .f = f };
-    if (-1.0f < f && f < 1.0) return (cmxe2m1) { .s = c.s, .m = (int) (fabsf(f) + 0.5f) };
-    if (f < -6.0f || 6.0f < f) return (cmxe2m1) { .s = c.s, .e = 3, .m = 1 };
+    c.r += 1 << 21;
     return (cmxe2m1) { .s = c.s, .e = c.e - 126, .m = c.m >> 22 };
 }
 

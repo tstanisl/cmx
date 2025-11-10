@@ -22,11 +22,11 @@ static inline cmxe4m3 cmxe4m3_encode(float f) {
 }
 
 static inline float cmxe2m1_decode(cmxe2m1 m) {
-    return (cmxcvt_) { .s = m.s, .e = m.e + 120, .m = m.m << 20 }.f;
+    return (cmxcvt_) { .s = m.s, .e = m.e + 126, .m = m.m << 22 }.f;
 }
 
 static inline float cmxe4m3_decode(cmxe4m3 m) {
-    return (cmxcvt_) { .s = m.s, .e = m.e + 126, .m = m.m << 22 }.f;
+    return (cmxcvt_) { .s = m.s, .e = m.e + 120, .m = m.m << 20 }.f;
 }
 
 #endif

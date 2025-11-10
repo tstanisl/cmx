@@ -16,7 +16,7 @@ static inline cmxe2m1 cmxe2m1_encode(float f) {
     if (f < -6.0f  || 6.0f < f) return (cmxe2m1) { .s = c.s, .e = 3, .m = 1 };
     if (-0.25f < f && f < 0.25) return (cmxe2m1) { .s = c.s, .e = 0, .m = 0 };
     if (-0.75f < f && f < 0.75) return (cmxe2m1) { .s = c.s, .e = 0, .m = 1 };
-    if (    -1 < f && f < 1   ) return (cmxe2m1) { .s = c.s, .e = 1, .m = 0};
+    if (    -1 < f && f < 1   ) return (cmxe2m1) { .s = c.s, .e = 1, .m = 0 };
     c.r += 1 << 21;
     return (cmxe2m1) { .s = c.s, .e = c.e - 126, .m = c.m >> 22 };
 }

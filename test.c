@@ -20,9 +20,9 @@ typedef struct {
     for (size_t i = 0; i < sizeof(testcases) / sizeof(tc_s); ++i) {   \
         tc_s t = (testcases)[i];                                      \
         type m = type ## _encode(t.x);                                \
-        CHECK(m.r == t.r, "\tError: encode: %g -> %08b (got %08b)\n", \
-                           t.x, t.r, m.r);                            \
         float z = type ## _decode(m);                                 \
+        CHECK(m.r == t.r, "\tError: encode: %g -> %08b (got %08b/%g)\n", \
+                           t.x, t.r, m.r, z);                         \
         CHECK(z == t.y,   "\tError: decode: %g -> %g (got %g)\n",     \
                           t.x, t.y, z);                               \
     }                                                                 \

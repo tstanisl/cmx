@@ -14,6 +14,7 @@ typedef union { float f; struct { uint32_t m:23, e:8, s:1; }; } cmxcvt_;
 static inline cmxe2m1 cmxe2m1_encode(float f) {
     cmxcvt_ c = { .f = f };
     if (-1.0f < f && f < 1.0) return (cmxe2m1) { .s = c.s };
+    if (f < -6.0f || 6.0f < f) return (cmxe2m1) { .s = c.s, .e = 3, .m = 1 };
     return (cmxe2m1) { .s = c.s, .e = c.e - 126, .m = c.m >> 22 };
 }
 

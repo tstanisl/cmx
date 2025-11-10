@@ -13,9 +13,10 @@ typedef union { float f; uint32_t r; struct { uint32_t m:23, e:8, s:1; }; } cmxc
 
 static inline cmxe2m1 cmxe2m1_encode(float f) {
     cmxcvt_ c = { .f = f };
-    if (f < -6.0f || 6.0f < f) return (cmxe2m1) { .s = c.s, .e = 3, .m = 1 };
-    if (-0.75f < f && f < 0.75) return (cmxe2m1) { .s = c.s, .m = (int) (2 * fabsf(f) + 0.5f) };
-    if (-1 < f && f < 1) return (cmxe2m1) { .s = (f < 0), .e = 1};
+    if (f < -6.0f  || 6.0f < f) return (cmxe2m1) { .s = c.s, .e = 3, .m = 1 };
+    if (-0.25f < f && f < 0.25) return (cmxe2m1) { .s = c.s, .e = 0, .m = 0 };
+    if (-0.75f < f && f < 0.75) return (cmxe2m1) { .s = c.s, .e = 0, .m = 1 };
+    if (    -1 < f && f < 1   ) return (cmxe2m1) { .s = c.s, .e = 1, .m = 0};
     c.r += 1 << 21;
     return (cmxe2m1) { .s = c.s, .e = c.e - 126, .m = c.m >> 22 };
 }

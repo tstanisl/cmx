@@ -11,14 +11,13 @@ typedef union { uint8_t r; struct { uint8_t m:3, e:4, s:1;      }; } cmxe4m3;
 // helper for conversions from float
 typedef union { float f; uint32_t r; struct { uint32_t m:23, e:8, s:1; }; } cmxcvt_;
 
-static inline cmxe2m1 cmxe2m1_encode(float f) {
-    cmxcvt_ c = { .f = f };
-    if (f < -6.0f  || 6.0f < f) return (cmxe2m1) { .s = c.s, .e = 3, .m = 1 };
-    if (-0.25f < f && f < 0.25) return (cmxe2m1) { .s = c.s, .e = 0, .m = 0 };
-    if (-0.75f < f && f < 0.75) return (cmxe2m1) { .s = c.s, .e = 0, .m = 1 };
-    if (    -1 < f && f < 1   ) return (cmxe2m1) { .s = c.s, .e = 1, .m = 0 };
-    c.r += 1 << 21;
-    return (cmxe2m1) { .s = c.s, .e = c.e - 126, .m = c.m >> 22 };
+cmxe2m1 cmxe2m1_encode(float f) {
+    cmxcvt_ c_ = { .f = f };
+    cmxcvt_ c  = { .e = c_.e, .m = c_.m };
+    c = c.f < 6 ? c : (cmxcvt_){ .f = 6 };
+    c = c.f < 1 ? (cmxcvt_){ .f = 0.625f + 0.5f * c.f }
+                : (cmxcvt_){ .r = c.r + (1 << 21) };
+    return (cmxe2m1) { .s = c_.s, .e = c.e - 126, .m = c.m >> 22 };
 }
 
 static inline cmxe4m3 cmxe4m3_encode(float f) {

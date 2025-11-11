@@ -115,6 +115,15 @@ static tc_s e4m3_tests[] =  {
 };
 
 int main() {
+#if 0
+    for (float x = 0; x < 4; x += 0x1p-4) {
+        cmxcvt_ c = { .f = x };
+        if (c.e < 127) c.f = 0.625f + 0.5f * c.f;
+        else c.r += 1 << 21;
+        LOG("%6g %6g\n", x, c.f);
+    }
+    return 0;
+#endif
     TEST(cmxe2m1, e2m1_tests);
     TEST(cmxe4m3, e4m3_tests);
 }

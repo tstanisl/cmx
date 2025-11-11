@@ -21,8 +21,12 @@ cmxe2m1 cmxe2m1_encode(float f) {
 }
 
 static inline cmxe4m3 cmxe4m3_encode(float f) {
-    cmxcvt_ c = { .f = f };
-    return (cmxe4m3) { .s = c.s, .e = c.e - 120, .m = c.m >> 20 };
+    cmxcvt_ c_ = { .f = f };
+    cmxcvt_ c  = { .e = c_.e, .m = c_.m };
+    c = c.f >= 448 ? (cmxcvt_){ .f = 448 } : c;
+    c = c.f >= 0x1p-6 ? (cmxcvt_){ .r = c.r + (1 << 19) }
+                      : (cmxcvt_){ .f = 0.5 * 0x1p-6 + 0.25f * 0x1p-9 + 0.5f * c.f };
+    return (cmxe4m3) { .s = c_.s, .e = c.e - 120, .m = c.m >> 20 };
 }
 
 static inline float cmxe2m1_decode(cmxe2m1 m) {
@@ -31,6 +35,7 @@ static inline float cmxe2m1_decode(cmxe2m1 m) {
 }
 
 static inline float cmxe4m3_decode(cmxe4m3 m) {
+    if (m.e == 0) return (m.s ? -0x1p-9 : 0x1p-9) * m.m;
     return (cmxcvt_) { .s = m.s, .e = m.e + 120, .m = m.m << 20 }.f;
 }
 

@@ -23,7 +23,8 @@ typedef struct {
         float z = type ## _decode(m);                                 \
         CHECK(m.r == t.r, "\tError: encode: %g -> %08b (got %08b/%g)\n", \
                            t.x, t.r, m.r, z);                         \
-        CHECK(z == t.y,   "\tError: decode: %g -> %g (got %g)\n",     \
+        CHECK((isnan(z) && isnan(t.y)) ||                             \
+              z == t.y,   "\tError: decode: %g -> %g (got %g)\n",     \
                           t.x, t.y, z);                               \
     }                                                                 \
     LOG("\tPassed\n");                                                \
@@ -110,19 +111,32 @@ static tc_s e2m1_tests[] =  {
 };
 
 static tc_s e4m3_tests[] =  {
-    { -1.0f,   -1.0f, 0b1'0111'000 },
-    {  1.0f,    1.0f, 0b0'0111'000 },
+    {  -999.0f,  -448.0f, 0b1'1111'110 },
+    {  -449.0f,  -448.0f, 0b1'1111'110 },
+    {  -448.0f,  -448.0f, 0b1'1111'110 },
+    {    -1.0f,    -1.0f, 0b1'0111'000 },
+    {    -0.0f,    -0.0f, 0b1'0000'000 },
+    {     0.0f,     0.0f, 0b0'0000'000 },
+    //{0x09p-10f,   0x1p-6, 0b0'0001'000 },
+    {0.875*0x1p-6, 0.875*0x1p-6, 0b0'0000'111 },
+    {0x10p-10f,   0x1p-6, 0b0'0001'000 },
+    //{0x11p-10f,   0x1p-6, 0b0'0001'000 },
+    {     1.0f,     1.0f, 0b0'0111'000 },
+    {   448.0f,   448.0f, 0b0'1111'110 },
+    {   449.0f,   448.0f, 0b0'1111'110 },
+    {   999.0f,   448.0f, 0b0'1111'110 },
 };
 
 int main() {
-    for (float x = -7; x <= 7; x += 0.5f) {
+    for (float x = -7; x <= 7; x += 0x1p-3f) {
     for (float d = -1; d <= 1; d += 1.0f) {
-        float y = x + 0x1p-3f * d;
+        float y = x + 0x1p-10f * d;
         //cmxf32 c = { .f = y * 0x1p-126f };
         //LOG("%8g %032b -> s=%b e=%08x m=%023b \n", y, c.r, c.s, c.e, c.m);
-        auto m = cmxe2m1_encode(y);
-        LOG("%8g %8g %04b\n", y, cmxe2m1_decode(m), m.r);
+        auto m = cmxe4m3_encode(y);
+        LOG("%8g %8g %04b\n", y, cmxe4m3_decode(m), m.r);
     }}
     TEST(cmxe2m1, e2m1_tests);
+    TEST(cmxe4m3, e4m3_tests);
 }
 

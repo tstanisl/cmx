@@ -33,5 +33,18 @@ static inline float cmxe2m1_decode(cmxe2m1 m) {
     return c.f * 0x1p126f;
 }
 
+static inline cmxe4m3 cmxe4m3_encode(float f) {
+    if (f < -CMXE4M3_MAX) f = -CMXE4M3_MAX;
+    if (f > +CMXE4M3_MAX) f = +CMXE4M3_MAX;
+    cmxf32 c = { .f = f * 0x1p-120f };
+    c.r += 1u << 19;
+    return (cmxe4m3) { .s = c.s, .e = c.e, .m = c.m >> 20};
+}
+
+static inline float cmxe4m3_decode(cmxe4m3 m) {
+    cmxf32 c = { .s = m.s, .e = m.e, .m = m.m << 20 };
+    return c.f * 0x1p120f;
+}
+
 #endif
 

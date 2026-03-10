@@ -115,14 +115,14 @@ static tc_s e4m3_tests[] =  {
 };
 
 int main() {
-#if 1
-    for (float x = 0; x < 4; x += 0x1p-8) {
-        auto m = cmxe4m3_encode(x);
-        LOG("%8g %8g %08b\n", x, cmxe4m3_decode(m), m.r);
-    }
-    return 0;
-#endif
+    for (float x = -7; x <= 7; x += 0.5f) {
+    for (float d = -1; d <= 1; d += 1.0f) {
+        float y = x + 0x1p-3f * d;
+        //cmxf32 c = { .f = y * 0x1p-126f };
+        //LOG("%8g %032b -> s=%b e=%08x m=%023b \n", y, c.r, c.s, c.e, c.m);
+        auto m = cmxe2m1_encode(y);
+        LOG("%8g %8g %04b\n", y, cmxe2m1_decode(m), m.r);
+    }}
     TEST(cmxe2m1, e2m1_tests);
-    TEST(cmxe4m3, e4m3_tests);
 }
 

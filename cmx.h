@@ -34,6 +34,7 @@ static inline float cmxe2m1_decode(cmxe2m1 m) {
 }
 
 static inline cmxe4m3 cmxe4m3_encode(float f) {
+    if (isnan(f)) return (cmxe4m3) { .r = 0x7f };
     if (f < -CMXE4M3_MAX) f = -CMXE4M3_MAX;
     if (f > +CMXE4M3_MAX) f = +CMXE4M3_MAX;
     cmxf32 c = { .f = f * 0x1p-120f };
@@ -42,6 +43,7 @@ static inline cmxe4m3 cmxe4m3_encode(float f) {
 }
 
 static inline float cmxe4m3_decode(cmxe4m3 m) {
+    if ((~m.r & 0x7f) == 0) return NAN;
     cmxf32 c = { .s = m.s, .e = m.e, .m = m.m << 20 };
     return c.f * 0x1p120f;
 }
